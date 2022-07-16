@@ -1,0 +1,54 @@
+#!/usr/bin/env python3
+# THIS FILE IS LICENSED UNDER THE FOLLOWING TERMS
+#
+# this code may not be used for any purpose. be gay, do crime
+#
+# THE FOLLOWING MESSAGE IS NOT A LICENSE
+#
+# <ren@kararou.space> wrote this file.
+# by reading this text, you are reading "TRANS RIGHTS".
+# this file and the content within it is the gay agenda.
+# if we meet some day, and you thing this stuff is worth it,
+# you can buy me a beer, tea, or something stronger.
+# -Ren Kararou
+
+import oauth2 as oauth
+import json
+import requests
+import time
+import argparse
+
+def getSwag(args):
+    url = "https://%s.suitetalk.api.netsuite.com/services/rest/record/v1/metadata-catalog" % (args.customer)
+    consumer = oauth.Consumer(key=args.int_id, secret=args.int_key)
+    token = oauth.Token(key=args.tok_id, secret=args.tok_key)
+    realm = args.customer
+    params = {
+        'oauth_version': "1.0",
+        'oauth_nonce': oauth.generate_nonce(),
+        'oauth_timestamp': str(int(time.time())),
+        'oauth_token': token.key,
+        'oauth_consumer_key': consumer.key
+    }
+    req = oauth.Request(method="GET", url=url, parameters=params)
+    signature_method = oauth.SignatureMethod_HMAC_SHA256()
+    req.sign_request(signature_method, consumer, token)
+    header = req.to_header(realm)
+    headery = header['Authorization'].encode('ascii', 'ignore')
+    headerx = {"Authorization": headery, "Accept": "application/swagger+json"}
+    conn = requests.get(url, headers=headerx)
+    return(conn.text)
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+            prog="netswag",
+            description="Get swagger definition files for NetSuite REST API",
+            epilog="(c) Ren Kararou 2022"
+            )
+    parser.add_argument('customer', type=str, help="Customer ID")
+    parser.add_argument('int_id', type=str, help="Integration Consumer ID")
+    parser.add_argument('int_key', type=str, help="Integration Consumer Key")
+    parser.add_argument('tok_id', type=str, help="Token ID")
+    parser.add_argument('tok_key', type=str, help="Token Key")
+    print(getSwag(parser.parse_args()))
+
